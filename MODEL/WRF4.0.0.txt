@@ -25,6 +25,7 @@ export F77=mpif77
 export NETCDF_classic=0
 
 ##./configure screen
+./configure
 checking for perl5... no
 checking for perl... found /usr/bin/perl (perl)
 Will use NETCDF in dir: /usr/local/netcdf/4.6.1_intel21
