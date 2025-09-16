@@ -1,0 +1,251 @@
+##Download reference site
+https://www2.mmm.ucar.edu/wrf/users/download/
+https://www2.mmm.ucar.edu/wrf/users/download/get_sources_new.php?
+https://www2.mmm.ucar.edu/wrf/users/
+
+OS : Rocky 8.9
+intel 21, mpich 4.1.2, HDF5 1.10.5, netcdf 4.6.1_Fortran 4.4.5
+
+##tar version v4.0.0
+https://www2.mmm.ucar.edu/wrf/users/download/get_sources.html#current
+
+##wget
+wget https://www2.mmm.ucar.edu/wrf/src/WRFV4.0.TAR.gz
+mv WRFV4.0.TAR.gz WRFV4.0.tar.gz
+
+##Compiler
+source /usr/local/intel/oneapi/compiler/latest/env/vars.sh intel64
+export MPICH=/usr/local/mpi/intel21/mpich-4.1.2
+export HDF5=/usr/local/hdf5/1.10.5_intel21
+export NETCDF=/usr/local/netcdf/4.6.1_intel21
+export CC=mpicc
+export CXX=mpicxx
+export FC=mpif90
+export F77=mpif77
+export NETCDF_classic=0
+
+##./configure screen
+checking for perl5... no
+checking for perl... found /usr/bin/perl (perl)
+Will use NETCDF in dir: /usr/local/netcdf/4.6.1_intel21
+Will use HDF5 in dir: /usr/local/hdf5/1.10.5_intel21
+PHDF5 not set in environment. Will configure WRF for use without.
+Will use 'time' to report timing information
+$JASPERLIB or $JASPERINC not found in environment, configuring to build without grib2 I/O...
+------------------------------------------------------------------------
+Please select from among the following Linux x86_64 options:
+
+  1. (serial)   2. (smpar)   3. (dmpar)   4. (dm+sm)   PGI (pgf90/gcc)
+  5. (serial)   6. (smpar)   7. (dmpar)   8. (dm+sm)   PGI (pgf90/pgcc): SGI MPT
+  9. (serial)  10. (smpar)  11. (dmpar)  12. (dm+sm)   PGI (pgf90/gcc): PGI accelerator
+ 13. (serial)  14. (smpar)  15. (dmpar)  16. (dm+sm)   INTEL (ifort/icc)
+                                         17. (dm+sm)   INTEL (ifort/icc): Xeon Phi (MIC architecture)
+ 18. (serial)  19. (smpar)  20. (dmpar)  21. (dm+sm)   INTEL (ifort/icc): Xeon (SNB with AVX mods)
+ 22. (serial)  23. (smpar)  24. (dmpar)  25. (dm+sm)   INTEL (ifort/icc): SGI MPT
+ 26. (serial)  27. (smpar)  28. (dmpar)  29. (dm+sm)   INTEL (ifort/icc): IBM POE
+ 30. (serial)               31. (dmpar)                PATHSCALE (pathf90/pathcc)
+ 32. (serial)  33. (smpar)  34. (dmpar)  35. (dm+sm)   GNU (gfortran/gcc)
+ 36. (serial)  37. (smpar)  38. (dmpar)  39. (dm+sm)   IBM (xlf90_r/cc_r)
+ 40. (serial)  41. (smpar)  42. (dmpar)  43. (dm+sm)   PGI (ftn/gcc): Cray XC CLE
+ 44. (serial)  45. (smpar)  46. (dmpar)  47. (dm+sm)   CRAY CCE (ftn $(NOOMP)/cc): Cray XE and XC
+ 48. (serial)  49. (smpar)  50. (dmpar)  51. (dm+sm)   INTEL (ftn/icc): Cray XC
+ 52. (serial)  53. (smpar)  54. (dmpar)  55. (dm+sm)   PGI (pgf90/pgcc)
+ 56. (serial)  57. (smpar)  58. (dmpar)  59. (dm+sm)   PGI (pgf90/gcc): -f90=pgf90
+ 60. (serial)  61. (smpar)  62. (dmpar)  63. (dm+sm)   PGI (pgf90/pgcc): -f90=pgf90
+ 64. (serial)  65. (smpar)  66. (dmpar)  67. (dm+sm)   INTEL (ifort/icc): HSW/BDW
+ 68. (serial)  69. (smpar)  70. (dmpar)  71. (dm+sm)   INTEL (ifort/icc): KNL MIC
+ 72. (serial)  73. (smpar)  74. (dmpar)  75. (dm+sm)   FUJITSU (frtpx/fccpx): FX10/FX100 SPARC64 IXfx/Xlfx
+
+Enter selection [1-75] : 15
+------------------------------------------------------------------------
+Compile for nesting? (1=basic, 2=preset moves, 3=vortex following) [default 1]: 1
+
+Configuration successful! 
+------------------------------------------------------------------------
+testing for fseeko and fseeko64
+fseeko64 is supported
+------------------------------------------------------------------------
+
+# Settings for    Linux x86_64 ppc64le i486 i586 i686, ifort compiler with icc  (dmpar)
+#
+#        By default, some files are compiled without optimizations to speed up compilation. Removing
+#        respective makefile rules in the end of this file will result in longer compilation time, and, possibly
+#        Out Of Memory messages, but might produce binaries which are substantially faster.
+#
+#        Please visit http://www.intel.com/support/performancetools/sb/cs-028607.htm 
+#        for latest info on how to build WRF with Intel compilers.
+#
+#        If you got Out Of Memory message, there are several options:
+#          1. Check your memory limits (ulimit -a), possibly increasing swap partitions size.
+#          2. Remove any debugging flags (-g, -check, -traceback).
+#          3. Force the problematic file to be compiled with less optimizations (see examples at the 
+#             end of this file), try -no-ip compiler flag.
+#
+#        This configuration is aimed at accuracy. To improve performance (at the expence of accuracy) you might
+#        consider removing '-fp-model precise' flag from FCBASEOPTS. This enables non value-safe optimizations.
+#        Another option is to add '-ftz' flag, which flushes denormal results to zero when the application is in
+#        the gradual underflow mode. It may improve performance if the denormal values are not critical to the
+#        behavior of your workload. To further improve performance, add suitable vectorization options for your
+#        processor to FCOPTIM (see ifort manpage).
+#
+#        If you have Intel MPI installed and wish to use instead, make the
+#        following changes to settings below:
+#        DM_FC  = mpiifort
+#        DM_CC  = mpiicc
+#        and source bin64/mpivars.sh file from your Intel MPI installation
+#        before the build.
+#
+#        Suggestions for timing improvements from Craig Mattocks
+#
+#CFLAGS_LOCAL    =       -w -O3 -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars 
+#LDFLAGS_LOCAL   =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common 
+#FCBASEOPTS_NO_G =       -w -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-heap-arrays -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common $(FORMAT_FREE) $(BYTESWAPIO)
+
+DESCRIPTION     =       INTEL ($SFC/$SCC)
+DMPARALLEL      =        1
+OMPCPP          =       # -D_OPENMP
+OMP             =       # -openmp -fpp -auto
+OMPCC           =       # -openmp -fpp -auto
+SFC             =       ifort
+SCC             =       icc
+CCOMP           =       icc
+DM_FC           =       mpif90 -f90=$(SFC)
+DM_CC           =       mpicc -cc=$(SCC)
+FC              =       time $(DM_FC)
+CC              =       $(DM_CC) -DFSEEKO64_OK 
+LD              =       $(FC)
+RWORDSIZE       =       $(NATIVE_RWORDSIZE)
+PROMOTION       =       -real-size `expr 8 \* $(RWORDSIZE)` -i4
+ARCH_LOCAL      =       -DNONSTANDARD_SYSTEM_FUNC  -DWRF_USE_CLM
+CFLAGS_LOCAL    =       -w -O3 -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars
+LDFLAGS_LOCAL   =       -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common
+CPLUSPLUSLIB    =       
+ESMF_LDFLAG     =       $(CPLUSPLUSLIB)
+FCOPTIM         =       -O3
+FCREDUCEDOPT	=       $(FCOPTIM)
+FCNOOPT		=       -O0 -fno-inline -no-ip
+FCDEBUG         =       # -g $(FCNOOPT) -traceback # -fpe0 -check noarg_temp_created,bounds,format,output_conversion,pointers,uninit -ftrapuv -unroll0 -u
+FORMAT_FIXED    =       -FI
+FORMAT_FREE     =       -FR
+FCSUFFIX        =
+BYTESWAPIO      =       -convert big_endian
+RECORDLENGTH    =       -assume byterecl
+FCBASEOPTS_NO_G =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-heap-arrays -no-prec-div -no-prec-sqrt -fno-common
+FCBASEOPTS      =       $(FCBASEOPTS_NO_G) $(FCDEBUG)
+MODULE_SRCH_FLAG =     
+TRADFLAG        =      -traditional-cpp
+CPP             =      /lib/cpp -P -nostdinc
+AR              =      ar
+ARFLAGS         =      ru
+M4              =      m4
+RANLIB          =      ranlib
+RLFLAGS		=	
+CC_TOOLS        =      $(SCC) 
+
+###########################################################
+######################
+# POSTAMBLE
+
+FGREP = fgrep -iq
+
+ARCHFLAGS       =    $(COREDEFS) -DIWORDSIZE=$(IWORDSIZE) -DDWORDSIZE=$(DWORDSIZE) -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=$(LWORDSIZE) \
+                     $(ARCH_LOCAL) \
+                     $(DA_ARCHFLAGS) \
+                      -DDM_PARALLEL \
+                       \
+                      -DNETCDF \
+                       \
+                       \
+                       \
+                       \
+                       \
+                      -DHDF5 \
+                       \
+                       \
+                       \
+                       \
+                      -DUSE_ALLOCATABLES \
+                      -Dwrfmodel \
+                      -DGRIB1 \
+                      -DINTIO \
+                      -DKEEP_INT_AROUND \
+                      -DLIMIT_ARGS \
+                      -DBUILD_RRTMG_FAST=1 \
+                      -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
+                      -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
+                      -DMAX_HISTORY=$(MAX_HISTORY) \
+		      -DNMM_NEST=$(WRF_NMM_NEST)
+CFLAGS          =    $(CFLAGS_LOCAL) -DDM_PARALLEL  \
+                      -DMAX_HISTORY=$(MAX_HISTORY) -DNMM_CORE=$(WRF_NMM_CORE)
+FCFLAGS         =    $(FCOPTIM) $(FCBASEOPTS)
+ESMF_LIB_FLAGS  =    
+# ESMF 5 -- these are defined in esmf.mk, included above
+ ESMF_IO_LIB     =    -L$(WRF_SRC_ROOT_DIR)/external/esmf_time_f90 -lesmf_time
+ESMF_IO_LIB_EXT =    -L$(WRF_SRC_ROOT_DIR)/external/esmf_time_f90 -lesmf_time
+INCLUDE_MODULES =    $(MODULE_SRCH_FLAG) \
+                     $(ESMF_MOD_INC) $(ESMF_LIB_FLAGS) \
+                      -I$(WRF_SRC_ROOT_DIR)/main \
+                      -I$(WRF_SRC_ROOT_DIR)/external/io_netcdf \
+                      -I$(WRF_SRC_ROOT_DIR)/external/io_int \
+                      -I$(WRF_SRC_ROOT_DIR)/frame \
+                      -I$(WRF_SRC_ROOT_DIR)/share \
+                      -I$(WRF_SRC_ROOT_DIR)/phys \
+                      -I$(WRF_SRC_ROOT_DIR)/wrftladj \
+                      -I$(WRF_SRC_ROOT_DIR)/chem -I$(WRF_SRC_ROOT_DIR)/inc \
+                      -I$(NETCDFPATH)/include \
+                      
+REGISTRY        =    Registry
+CC_TOOLS_CFLAGS = -DNMM_CORE=$(WRF_NMM_CORE)
+
+ LIB_BUNDLED     = \
+                      $(WRF_SRC_ROOT_DIR)/external/fftpack/fftpack5/libfftpack.a \
+                      $(WRF_SRC_ROOT_DIR)/external/io_grib1/libio_grib1.a \
+                      $(WRF_SRC_ROOT_DIR)/external/io_grib_share/libio_grib_share.a \
+                      $(WRF_SRC_ROOT_DIR)/external/io_int/libwrfio_int.a \
+                      $(ESMF_IO_LIB) \
+                      $(WRF_SRC_ROOT_DIR)/external/RSL_LITE/librsl_lite.a \
+                      $(WRF_SRC_ROOT_DIR)/frame/module_internal_header_util.o \
+                      $(WRF_SRC_ROOT_DIR)/frame/pack_utils.o 
+
+ LIB_EXTERNAL    = \
+                      -L$(WRF_SRC_ROOT_DIR)/external/io_netcdf -lwrfio_nf -L/usr/local/netcdf/4.6.1_intel21/lib -lnetcdff -lnetcdf     -L/usr/local/hdf5/1.10.5_intel21/lib -lhdf5_fortran -lhdf5 -lm -lz
+
+LIB             =    $(LIB_BUNDLED) $(LIB_EXTERNAL) $(LIB_LOCAL) $(LIB_WRF_HYDRO)
+LDFLAGS         =    $(OMP) $(FCFLAGS) $(LDFLAGS_LOCAL) 
+ENVCOMPDEFS     =    
+WRF_CHEM	=	0 
+CPPFLAGS        =    $(ARCHFLAGS) $(ENVCOMPDEFS) -I$(LIBINCLUDE) $(TRADFLAG) 
+NETCDFPATH      =    /usr/local/netcdf/4.6.1_intel21
+HDF5PATH        =    /usr/local/hdf5/1.10.5_intel21
+WRFPLUSPATH     =    
+RTTOVPATH       =    
+PNETCDFPATH     =    
+
+bundled:  io_only 
+external: io_only $(WRF_SRC_ROOT_DIR)/external/RSL_LITE/librsl_lite.a gen_comms_rsllite module_dm_rsllite $(ESMF_TARGET)
+io_only:  esmf_time wrfio_nf   \
+	  wrf_ioapi_includes wrfio_grib_share wrfio_grib1 wrfio_int fftpack
+
+
+######################
+------------------------------------------------------------------------
+Settings listed above are written to configure.wrf.
+If you wish to change settings, please edit that file.
+If you wish to change the default options, edit the file:
+     arch/configure.defaults
+NetCDF users note:
+ This installation of NetCDF supports large file support.  To DISABLE large file
+ support in NetCDF, set the environment variable WRFIO_NCD_NO_LARGE_FILE_SUPPORT
+ to 1 and run configure again. Set to any other value to avoid this message.
+  
+
+Testing for NetCDF, C and Fortran compiler
+
+This installation of NetCDF is 64-bit
+                 C compiler is 64-bit
+           Fortran compiler is 64-bit
+              It will build in 64-bit
+
+*****************************************************************************
+This build of WRF will use classic (non-compressed) NETCDF format
+*****************************************************************************
