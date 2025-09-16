@@ -1,31 +1,19 @@
-##Download reference site
-https://github.com/wrf-model/WRF
-https://www2.mmm.ucar.edu/wrf/users/download/
-https://www2.mmm.ucar.edu/wrf/users/download/get_sources_new.php?
-https://www2.mmm.ucar.edu/wrf/users/
+##tar download
+wget https://github.com/wrf-model/WRF/archive/refs/tags/v4.6.1.tar.gz
+##tar download (sub module+)
+git clone --recurse-submodules https://github.com/wrf-model/WRF.git WRF-4.6.1
+##viewer page
+https://github.com/wrf-model/WRF/tree/v4.6.1
 
 OS : Rocky 8.9
 intel 21, mpich 4.1.2, HDF5 1.10.5, netcdf 4.6.1_Fortran 4.4.5
 
-##tar version v4.0.0
-https://www2.mmm.ucar.edu/wrf/users/download/get_sources.html#current
-
-##wget
-wget https://www2.mmm.ucar.edu/wrf/src/WRFV4.0.TAR.gz
-mv WRFV4.0.TAR.gz WRFV4.0.tar.gz
-
-##Compiler
 source /usr/local/intel/oneapi/compiler/latest/env/vars.sh intel64
 export MPICH=/usr/local/mpi/intel21/mpich-4.1.2
 export HDF5=/usr/local/hdf5/1.10.5_intel21
 export NETCDF=/usr/local/netcdf/4.6.1_intel21
-export CC=mpicc
-export CXX=mpicxx
-export FC=mpif90
-export F77=mpif77
-export NETCDF_classic=0
 
-##./configure screen
+#configure
 ./configure
 checking for perl5... no
 checking for perl... found /usr/bin/perl (perl)
@@ -252,5 +240,14 @@ This installation of NetCDF is 64-bit
 This build of WRF will use classic (non-compressed) NETCDF format
 *****************************************************************************
 
-#### test
+#compile
 ./compile em_real >& compile.log
+
+#check compile
+check compile.log
+check main/wrf.exe
+check test/em_real/wrf.exe
+
+#check pbs, wrf
+vi /usr/local/src/test_src/wrf.pbs
+qsub wrf.pbs
