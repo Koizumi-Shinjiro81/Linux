@@ -251,3 +251,6 @@ This installation of NetCDF is 64-bit
 *****************************************************************************
 This build of WRF will use classic (non-compressed) NETCDF format
 *****************************************************************************
+
+#### test
+./compile em_real >& compile.log
