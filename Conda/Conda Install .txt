@@ -1,0 +1,18 @@
+#콘다 실행
+conda activate
+#콘다 정지
+conda deactivate
+#콘다 자동실행
+conda config --set auto_activate_base false
+#콘다 정보
+conda config --show
+
+##MiniConda Install
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86.sh
+Enter
+yes
+/root/miniconda3
+yes
+
+##AnaConda Install
