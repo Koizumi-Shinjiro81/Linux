@@ -1,0 +1,46 @@
+#콘다 실행
+conda activate
+
+#콘다 정지
+conda deactivate
+
+#콘다 자동실행
+conda config --set auto_activate_base false
+
+#콘다 정보
+conda config --show
+
+#콘다에서 사용가능한 python 버전들
+conda search python
+
+#콘다 생성 예시
+conda create -n test39 python=3.9
+
+#콘다 생성 및 버전 설정 다른 패키지 설치
+conda create -n test python=3.9 pytorch=2.6.0 -c pytorch
+#### -c pytorch는 공식채널을 사용한다라는 명령어
+
+#패키지 버전변경방법(설치하면 자동으로 버전변경, 의존성패키지 설치)
+conda install pytorch=2.5.1 -c pytorch
+
+#패키지 삭제방법
+conda remove pytorch
+
+#추가 패키지 설치방법
+conda install numpy=1.26 pandas=2.1
+
+#설치된 패키지 확인방법
+conda list
+
+#콘다 환경 삭제
+conda remove -n test --all
+
+##MiniConda Install
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86.sh
+Enter
+yes
+/root/miniconda3
+yes
+
+##AnaConda Install
