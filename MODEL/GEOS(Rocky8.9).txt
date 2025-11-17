@@ -1,0 +1,197 @@
+---------------------------------------------------------------------------------------------------------------------------------------------
+테스트용 서버 정보
+서버 : DELL R6625
+운영체제 : Rocky 8.9
+참고 사이트 : https://geosx-geosx.readthedocs-hosted.com/en/latest/docs/sphinx/QuickStart.html#repository-organization
+---------------------------------------------------------------------------------------------------------------------------------------------
+1. GEOS 다운
+git clone https://github.com/GEOS-DEV/GEOS.git GEOS
+cd GEOS
+git lfs install
+git submodule init
+git submodule update
+---------------------------------------------------------------------------------------------------------------------------------------------
+2. thirdPartyLibs 다운
+git clone https://github.com/GEOS-DEV/thirdPartyLibs.git thirdPartyLibs
+cd thirdPartyLibs
+git lfs install
+git pull
+git submodule init
+git submodule update
+---------------------------------------------------------------------------------------------------------------------------------------------
+3. 경로 설정
+~/GEOS/host-configs/quick-start-template.cmake
+---------------------------------------------------------------------------------------------------------------------------------------------
+3-1. 경로 위치 확인 명령어 (3-1-1 or 3-1-2)
+---------------------------------------------------------------------------------------------------------------------------------------------
+3-1-1. 컴파일러/병렬라이브러리 : gcc/mvapich
+which gcc
+/usr/bin/gcc
+which g++
+/usr/bin/g++
+which mpicc
+/usr/local/mpi/gcc85/mvapich2-2.3.4/bin/mpicc
+which mpicxx
+/usr/local/mpi/gcc85/mvapich2-2.3.4/bin/mpicxx
+which mpirun
+/usr/local/mpi/gcc85/mvapich2-2.3.4/bin/mpirun
+ls /usr/lib64/libblas.so
+/usr/lib64/libblas.so
+ls /usr/lib64/liblapack.so
+/usr/lib64/liblapack.so
+---------------------------------------------------------------------------------------------------------------------------------------------
+3-1-2. 컴파일러/병렬라이브러리 : gcc/openmpi
+which gcc
+/usr/bin/gcc
+which g++
+/usr/bin/g++
+which mpicc
+/usr/local/mpi/gcc85/openmpi-5.0.0/bin/mpicc
+which mpicxx
+/usr/local/mpi/gcc85/openmpi-5.0.0/bin/mpicxx
+which mpirun
+/usr/local/mpi/gcc85/openmpi-5.0.0/bin/mpirun
+ls /usr/lib64/libblas.so
+/usr/lib64/libblas.so
+ls /usr/lib64/liblapack.so
+/usr/lib64/liblapack.so
+---------------------------------------------------------------------------------------------------------------------------------------------
+3-2-1. vi quick-start-template.cmake 설정전 파일내용 (밑에있음)
+---------------------------------------------------------------------------------------------------------------------------------------------
+3-2-2. vi quick-start-template.cmake 설정후 파일내용 (밑에있음)
+---------------------------------------------------------------------------------------------------------------------------------------------
+4. TPL make랑 컴파일
+---------------------------------------------------------------------------------------------------------------------------------------------
+4-1. bulid 파일만들기
+[ads@mer00 geos-tpls]$ python3 scripts/config-build.py -hc ../GEOS/host-configs/quick-start-template.cmake -bt Release
+위 명령어가 성공했을시 build~, install~ 파일생김
+---------------------------------------------------------------------------------------------------------------------------------------------
+4-2 TPL make 하기
+cd build-quick-start-template-release
+make
+---------------------------------------------------------------------------------------------------------------------------------------------
+4-2-1 scotch 버전문제로 v7.0.8 -> v7.0.1로 변경
+scotch 버전이 높아서 make 실패
+make tar.gz 관련 버전 파일 경로 : cd ~/thirdPartyLibs/tplMirror
+251117기준 버전 정보 : ls ~/thirdPartyLibs/tplMirror (밑에있음)
+다운로드 명령어 : wget https://gitlab.inria.fr/scotch/scotch/-/archive/v7.0.1/scotch-v7.0.1.tar.gz
+ls /home/ads/thirdPartyLibs/build-quick-start-template-release/scotch/src/scotch-stamp/ 안에 파일내용 버전이름 변경 후
+다시 make
+---------------------------------------------------------------------------------------------------------------------------------------------
+5. GEOS make랑 컴파일
+cd ../../GEOS
+python3 scripts/config-build.py -hc host-configs/quick-start-template.cmake -bt Release
+위 명령어 안될시 아래 커맨드 사용
+python3 scripts/config-build.py -hc host-configs/quick-start-template.cmake -bt Release -D GEOS_TPL_DIR=/full/path/to/thirdPartyLibs 
+cd ~/GEOS/build-quick-start-template-release
+make 진행
+## make에서 오류, 밑에 경로 예제파일 오류, 예제파일 삭제하고 다시 make
+rm -rf ~/GEOS/examples/functions/function_examples/function_examples.xml
+make
+---------------------------------------------------------------------------------------------------------------------------------------------
+6. 테스트확인
+./bin/geosx -i ../inputFiles/singlePhaseFlow/3D_10x10x10_compressible_smoke.xml -v
+---------------------------------------------------------------------------------------------------------------------------------------------
+6-1 테스트 명령어
+mpirun -np 16 ./bin/geosx -i ../inputFiles/singlePhaseFlow/3D_10x10x10_compressible_smoke.xml -x 2 -y 2 -z 4
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+####파일내용 및 버전관련 정보
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------
+#### vi quick-start-template.cmake 설정전 파일내용
+set( CONFIG_NAME "quick-start" )
+  
+# Set compilers path
+set(CMAKE_C_COMPILER "path-to-gcc/bin/gcc" CACHE PATH "")   # This is typically something like /usr/bin/gcc ... or clang
+set(CMAKE_CXX_COMPILER "path-to-gcc/bin/g++" CACHE PATH "") # This is typically something like /usr/bin/g++ ... or clang++
+set(ENABLE_FORTRAN OFF CACHE BOOL "" FORCE)
+
+# Set paths to mpi
+set(ENABLE_MPI ON CACHE PATH "")
+set(MPI_C_COMPILER "path-to-mpi/bin/mpicc" CACHE PATH "")    # This is typically something like /usr/bin/mpicc
+set(MPI_CXX_COMPILER "path-to-mpi/bin/mpicxx" CACHE PATH "") # This is typically something like /usr/bin/mpicxx
+set(MPIEXEC "path-to-mpi/bin/mpirun" CACHE PATH "")          # This is typically something like /usr/bin/mpirun
+
+# Set paths to blas and lapack
+set( BLAS_LIBRARIES "path-to-blas" CACHE PATH "" FORCE )     # This is typically something like /usr/lib64/libblas.so 
+set( LAPACK_LIBRARIES "path-to-lapack" CACHE PATH "" FORCE ) # This is typically something like /usr/lib64/liblapack.so
+
+# Cuda and openMP
+set( ENABLE_CUDA OFF CACHE PATH "" FORCE )
+set( ENABLE_OPENMP OFF CACHE PATH "" FORCE )
+
+# TPLs
+set( ENABLE_TRILINOS OFF CACHE PATH "" FORCE )
+set( ENABLE_CALIPER OFF CACHE PATH "" FORCE )
+set( ENABLE_DOXYGEN OFF CACHE BOOL "" FORCE)
+set( ENABLE_MATHPRESSO OFF CACHE BOOL "" FORCE )
+
+if(NOT ( EXISTS "${GEOS_TPL_DIR}" AND IS_DIRECTORY "${GEOS_TPL_DIR}" ) )
+   set(GEOS_TPL_DIR "${CMAKE_SOURCE_DIR}/../../thirdPartyLibs/install-${CONFIG_NAME}-release" CACHE PATH "" FORCE )
+endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/tpls.cmake)
+---------------------------------------------------------------------------------------------------------------------------------------------
+#### vi quick-start-template.cmake 설정후 파일내용
+set( CONFIG_NAME "quick-start" )
+  
+# Set compilers path
+set(CMAKE_C_COMPILER "/opt/rh/gcc-toolset-12/root/usr/bin/gcc" CACHE PATH "")   # This is typically something like /usr/bin/gcc ... or clang
+set(CMAKE_CXX_COMPILER "/opt/rh/gcc-toolset-12/root/usr/bin/g++" CACHE PATH "") # This is typically something like /usr/bin/g++ ... or clang++
+set(ENABLE_FORTRAN OFF CACHE BOOL "" FORCE)
+
+# Set paths to mpi
+set(ENABLE_MPI ON CACHE PATH "")
+set(MPI_C_COMPILER "/usr/local/mpi/gcc85/openmpi-5.0.0/bin/mpicc" CACHE PATH "")    # This is typically something like /usr/bin/mpicc
+set(MPI_CXX_COMPILER "/usr/local/mpi/gcc85/openmpi-5.0.0/bin/mpicxx" CACHE PATH "") # This is typically something like /usr/bin/mpicxx
+set(MPIEXEC "/usr/local/mpi/gcc85/openmpi-5.0.0/bin/mpirun" CACHE PATH "")          # This is typically something like /usr/bin/mpirun
+
+# Set paths to blas and lapack
+set( BLAS_LIBRARIES "/usr/lib64/libblas.so" CACHE PATH "" FORCE )     # This is typically something like /usr/lib64/libblas.so 
+set( LAPACK_LIBRARIES "/usr/lib64/liblapack.so" CACHE PATH "" FORCE ) # This is typically something like /usr/lib64/liblapack.so
+set(GEOS_TPL_DIR "/home/ads/thirdPartyLibs/install-quick-start-template-release" CACHE PATH "")
+
+# Cuda and openMP
+set( ENABLE_CUDA OFF CACHE PATH "" FORCE )
+set( ENABLE_OPENMP OFF CACHE PATH "" FORCE )
+
+# TPLs
+set( ENABLE_TRILINOS OFF CACHE PATH "" FORCE )
+set( ENABLE_CALIPER OFF CACHE PATH "" FORCE )
+set( ENABLE_DOXYGEN OFF CACHE BOOL "" FORCE)
+set( ENABLE_MATHPRESSO OFF CACHE BOOL "" FORCE )
+
+if(NOT ( EXISTS "${GEOS_TPL_DIR}" AND IS_DIRECTORY "${GEOS_TPL_DIR}" ) )
+        set(GEOS_TPL_DIR "${CMAKE_SOURCE_DIR}/../../thirdPartyLibs/install-${CONFIG_NAME}-release" CACHE PATH "" FORCE )
+endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/tpls.cmake)
+---------------------------------------------------------------------------------------------------------------------------------------------
+ls ~/thirdPartyLibs/tplMirror
+adiak-0.4.0.tar.gz     
+conduit-0.9.2.tar.gz   
+hypre-v2.33.0-12-gbe52325a3.tar.gz     
+pugixml-1.13.tar.gz     
+silo-4.11.patch              
+trilinos-release-16-1-0.tar.gz
+asmjit-2e93826.zip     
+doxygen-1.8.20.tar.gz  
+mathpresso-24d60e5.zip                 
+RAJA-v2025.03.0.tar.gz  
+SuiteSparse-5.10.1.tar.gz    
+uncrustify-401a409.zip
+Caliper-2.12.0.tar.gz  
+fmt-11.0.1.tar.gz      
+parmetis-4.0.3-IDXTYPEWIDTH_64.tar.gz  
+scotch-v7.0.1.tar.gz    
+superlu_dist-0f6efc3.tar.gz  
+VTK-9.4.2.tar.gz
+chai-2025.03.0.tar.gz  
+hdf5-1.12.1.tar.gz     
+petsc-3.19.4.tar.gz                    
+silo-4.11.1-bsd.tar.xz  
+superlu_dist-9.0.0.tar.gz
+---------------------------------------------------------------------------------------------------------------------------------------------
