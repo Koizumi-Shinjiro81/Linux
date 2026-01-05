@@ -1,0 +1,214 @@
+SWAN Model Site URL : https://swanmodel.sourceforge.io/
+SWAN Model Download URL : https://swanmodel.sourceforge.io/download/zip/swan4151.tar.gz
+운영체제 : Rocky 8.7
+
+순서 1 (모듈 불러오기)
+[ads-swan@condatest swan4151]$ module load intel21/compiler-21 intel21/mpich-4.1.2 
+
+순서 2 (빌드 전 체크 항목)
+[ads-swan@condatest swan4151]$ perl -v
+[ads-swan@condatest swan4151]$ make -v
+[ads-swan@condatest swan4151]$ which ifort
+[ads-swan@condatest swan4151]$ which mpif90
+
+순서 3 (Makefile 있는지 확인)
+[ads-swan@condatest swan4151]$ ls -l Makefile
+
+순서 4 (macros.inc 생성)
+[ads-swan@condatest swan4151]$ make config
+[ads-swan@condatest swan4151]$ ls -l macros.inc
+
+순서 5 (macros.inc 파일 경로 설정)
+[ads-swan@condatest swan4151]$ vi macros.inc
+
+순서 6 (make)
+[ads-swan@condatest swan4151]$ make config
+[ads-swan@condatest swan4151]$ make mpi
+
+순서 7 (make 잘됐는지 확인 명령어)
+[ads-swan@condatest swan4151]$ ls -lh swan.exe hcat.exe
+-rwxrwxr-x 1 ads-swan ads-swan 1.2M 2026-01-05 15:08 hcat.exe
+-rwxrwxr-x 1 ads-swan ads-swan 5.3M 2026-01-05 15:08 swan.exe
+[ads-swan@condatest swan4151]$ file swan.exe
+swan.exe: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=718aaf82024d4b78a9b5412f933f4222b4127b76, not stripped
+[ads-swan@condatest swan4151]$ ldd swan.exe | head
+	linux-vdso.so.1 (0x00007ffe1b7eb000)
+	libmpifort.so.12 => /usr/local/mpi/intel21/mpich-4.1.2/lib/libmpifort.so.12 (0x00001534ee060000)
+	libmpi.so.12 => /usr/local/mpi/intel21/mpich-4.1.2/lib/libmpi.so.12 (0x00001534e9fb5000)
+	libm.so.6 => /lib64/libm.so.6 (0x00001534e9c33000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00001534e9a13000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00001534e980f000)
+	libc.so.6 => /lib64/libc.so.6 (0x00001534e944a000)
+	/lib64/ld-linux-x86-64.so.2 (0x00001534ee37a000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00001534e9232000)
+	libucp.so.0 => /lib64/libucp.so.0 (0x00001534e8f58000)
+[ads-swan@condatest swan4151]$ ./swan.exe
+Abort(4) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 4) - process 0
+[ads-swan@condatest swan4151]$ echo $?
+4
+
+순서 8 (mpi 실행)
+mpirun -np 2 ./swan.exe
+
+순서 9 (test 파일 다운로드)
+wget https://sourceforge.net/projects/swanmodel/files/testcases/refrac.tar.gz/download
+tar zxvf refrac.tar.gz
+
+순서 10 (swan.exe 옮기고 실행)
+cp ~/swan4151/swan.exe ~/refrac/
+mpirun -np 4 ./swan.exe
+
+결과 1
+[ads-swan@condatest refrac]$ mpirun -np 4 ./swan.exe
+
+ SWAN is preparing computation
+
+ iteration    1; sweep 1
++iteration    1; sweep 2
++iteration    1; sweep 3
++iteration    1; sweep 4
+ not possible to compute, first iteration
+
+ iteration    2; sweep 1
++iteration    2; sweep 2
++iteration    2; sweep 3
++iteration    2; sweep 4
+ accuracy OK in 100.00 % of wet grid points ( 99.50 % required)
+
++SWAN is processing output request    1
++SWAN is processing output request    2
++SWAN is processing output request    3
++SWAN is processing output request    4
+
+참고 1 (MAKE 종류들)
+[ads-swan@condatest swan4151]$ make
+This Makefile supports the following:
+make config    -- makes machine-dependent macros include file
+make ser       -- makes the serial swan.exe executable
+make omp       -- makes the OpenMP swan.exe executable
+make mpi       -- makes the    MPI swan.exe executable
+make jac       -- makes the    MPI swan.exe executable
+make coh       -- makes the MPI SWAN library for coupling with COHERENS
+make doc       -- makes the SWAN documentation (PDF)
+make clean     -- removes compiled objects and modules
+make clobber   -- removes compiled objects, modules and swan.exe
+make cleandoc  -- removes all SWAN documents
+
+참고 2 (make 관련 명령어)
+make clean (빌드가 꼬였을때 사용)
+make clobber (빌드가 꼬였을때 사용 더 강력한 명령어)
+make config (make 하기전 확인 명령어)
+
+
+
+----------------------------------------------- vi macros.inc 수정 전 -----------------------------------------------
+################################################################################
+# IA32_Intel/x86-64_Intel:      Intel Core/Xeon with Linux using Intel compiler.
+################################################################################
+F90_SER = ifort
+F90_OMP = ifort
+# for older compiler versions, use mpif90
+F90_MPI = mpiifort
+FLAGS_OPT = -O2
+FLAGS_MSC = -W0 -assume byterecl -traceback -diag-disable 8290 -diag-disable 8291 -diag-disable 8293
+FLAGS90_MSC = $(FLAGS_MSC)
+FLAGS_DYN = -fPIC
+FLAGS_SER =
+FLAGS_OMP = -qopenmp
+FLAGS_MPI =
+METISROOT =
+ifneq ($(METISROOT),)
+  LIBS_SER = -L$(METISROOT)/lib -lmetis -lGKlib
+  LIBS_OMP = -L$(METISROOT)/lib -lmetis -lGKlib
+  LIBS_MPI = -L$(METISROOT)/lib -lmetis -lGKlib
+  PART_OBJS = SwanParallel.o
+else
+  LIBS_SER =
+  LIBS_OMP =
+  LIBS_MPI =
+  PART_OBJS =
+endif
+NETCDFROOT =
+ifneq ($(NETCDFROOT),)
+  INCS_SER = -I$(NETCDFROOT)/include
+  INCS_OMP = -I$(NETCDFROOT)/include
+  INCS_MPI = -I$(NETCDFROOT)/include
+  LIBS_SER = $(LIBS_SER) -L$(NETCDFROOT)/lib -lnetcdf -lnetcdff
+  LIBS_OMP = $(LIBS_OMP) -L$(NETCDFROOT)/lib -lnetcdf -lnetcdff
+  LIBS_MPI = $(LIBS_MPI) -L$(NETCDFROOT)/lib -lnetcdf -lnetcdff
+  NCF_OBJS = nctablemd.o agioncmd.o swn_outnc.o
+else
+  INCS_SER =
+  INCS_OMP =
+  INCS_MPI =
+  NCF_OBJS =
+endif
+OUT = -o
+EXTO = o
+MAKE = make
+RM = rm -f
+ifneq ($(METISROOT),)
+  swch = -unix -impi -metis
+else
+  swch = -unix -impi
+endif
+ifneq ($(NETCDFROOT),)
+  swch = $(swch) -netcdf
+endif
+---------------------------------------------------- vi macros.inc ----------------------------------------------------
+
+----------------------------------------------- vi macros.inc 수정 후 -----------------------------------------------
+################################################################################
+# IA32_Intel/x86-64_Intel:      Intel Core/Xeon with Linux using Intel compiler.
+################################################################################
+F90_SER = ifort
+F90_OMP = ifort
+# for older compiler versions, use mpif90
+F90_MPI = mpif90
+FLAGS_OPT = -O2
+FLAGS_MSC = -W0 -assume byterecl -traceback -diag-disable 8290 -diag-disable 8291 -diag-disable 8293
+FLAGS90_MSC = $(FLAGS_MSC)
+FLAGS_DYN = -fPIC
+FLAGS_SER =
+FLAGS_OMP = -qopenmp
+FLAGS_MPI =
+METISROOT =
+ifneq ($(METISROOT),)
+  LIBS_SER = -L$(METISROOT)/lib -lmetis -lGKlib
+  LIBS_OMP = -L$(METISROOT)/lib -lmetis -lGKlib
+  LIBS_MPI = -L$(METISROOT)/lib -lmetis -lGKlib
+  PART_OBJS = SwanParallel.o
+else
+  LIBS_SER =
+  LIBS_OMP =
+  LIBS_MPI =
+  PART_OBJS =
+endif
+NETCDFROOT =
+ifneq ($(NETCDFROOT),)
+  INCS_SER = -I$(NETCDFROOT)/include
+  INCS_OMP = -I$(NETCDFROOT)/include
+  INCS_MPI = -I$(NETCDFROOT)/include
+  LIBS_SER = $(LIBS_SER) -L$(NETCDFROOT)/lib -lnetcdf -lnetcdff
+  LIBS_OMP = $(LIBS_OMP) -L$(NETCDFROOT)/lib -lnetcdf -lnetcdff
+  LIBS_MPI = $(LIBS_MPI) -L$(NETCDFROOT)/lib -lnetcdf -lnetcdff
+  NCF_OBJS = nctablemd.o agioncmd.o swn_outnc.o
+else
+  INCS_SER =
+  INCS_OMP =
+  INCS_MPI =
+  NCF_OBJS =
+endif
+OUT = -o
+EXTO = o
+MAKE = make
+RM = rm -f
+ifneq ($(METISROOT),)
+  swch = -unix -impi -metis
+else
+  swch = -unix 
+endif
+ifneq ($(NETCDFROOT),)
+  swch = $(swch) -netcdf
+endif
+---------------------------------------------------- vi macros.inc ----------------------------------------------------
