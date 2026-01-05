@@ -1,6 +1,7 @@
 SWAN Model Site URL : https://swanmodel.sourceforge.io/
 SWAN Model Download URL : https://swanmodel.sourceforge.io/download/zip/swan4151.tar.gz
 운영체제 : Rocky 8.7
+소요시간 : 2시간
 
 순서 1 (모듈 불러오기)
 [ads-swan@condatest swan4151]$ module load intel21/compiler-21 intel21/mpich-4.1.2 
