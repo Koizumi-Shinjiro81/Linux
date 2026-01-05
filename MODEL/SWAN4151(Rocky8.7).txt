@@ -21,6 +21,25 @@ SWAN Model Download URL : https://swanmodel.sourceforge.io/download/zip/swan4151
 순서 5 (macros.inc 파일 경로 설정)
 [ads-swan@condatest swan4151]$ vi macros.inc
 
+참고 1 (MAKE 종류들)
+[ads-swan@condatest swan4151]$ make
+This Makefile supports the following:
+make config    -- makes machine-dependent macros include file
+make ser       -- makes the serial swan.exe executable
+make omp       -- makes the OpenMP swan.exe executable
+make mpi       -- makes the    MPI swan.exe executable
+make jac       -- makes the    MPI swan.exe executable
+make coh       -- makes the MPI SWAN library for coupling with COHERENS
+make doc       -- makes the SWAN documentation (PDF)
+make clean     -- removes compiled objects and modules
+make clobber   -- removes compiled objects, modules and swan.exe
+make cleandoc  -- removes all SWAN documents
+
+참고 2 (make 관련 명령어)
+make clean (빌드가 꼬였을때 사용)
+make clobber (빌드가 꼬였을때 사용 더 강력한 명령어)
+make config (make 하기전 확인 명령어)
+
 순서 6 (make)
 [ads-swan@condatest swan4151]$ make config
 [ads-swan@condatest swan4151]$ make mpi
@@ -46,6 +65,12 @@ swan.exe: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linke
 Abort(4) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 4) - process 0
 [ads-swan@condatest swan4151]$ echo $?
 4
+
+참고 3
+~/swan4151 에서는 INPUT 파일이 없어서 실행해도 INPUT 파일이 없다고 실패할꺼다
+.swn << 이게 테스트 파일인데 이것도 없다
+refrac이라는 swan공식 테스트파일을 다운받아서 mpirun 돌릴꺼다
+~/swan4151 에서 컴파일하고 swan.exe 테스트파일로 복사 후 INPUT 파일 만들고 실행하는게 정상실행방법
 
 순서 8 (mpi 실행)
 mpirun -np 2 ./swan.exe
@@ -79,26 +104,6 @@ mpirun -np 4 ./swan.exe
 +SWAN is processing output request    2
 +SWAN is processing output request    3
 +SWAN is processing output request    4
-
-참고 1 (MAKE 종류들)
-[ads-swan@condatest swan4151]$ make
-This Makefile supports the following:
-make config    -- makes machine-dependent macros include file
-make ser       -- makes the serial swan.exe executable
-make omp       -- makes the OpenMP swan.exe executable
-make mpi       -- makes the    MPI swan.exe executable
-make jac       -- makes the    MPI swan.exe executable
-make coh       -- makes the MPI SWAN library for coupling with COHERENS
-make doc       -- makes the SWAN documentation (PDF)
-make clean     -- removes compiled objects and modules
-make clobber   -- removes compiled objects, modules and swan.exe
-make cleandoc  -- removes all SWAN documents
-
-참고 2 (make 관련 명령어)
-make clean (빌드가 꼬였을때 사용)
-make clobber (빌드가 꼬였을때 사용 더 강력한 명령어)
-make config (make 하기전 확인 명령어)
-
 
 
 ----------------------------------------------- vi macros.inc 수정 전 -----------------------------------------------
