@@ -72,7 +72,7 @@ Abort(4) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WOR
 refrac이라는 swan공식 테스트파일을 다운받아서 mpirun 돌릴꺼다
 ~/swan4151 에서 컴파일하고 swan.exe 테스트파일로 복사 후 INPUT 파일 만들고 실행하는게 정상실행방법
 
-순서 8 (mpi 실행)
+순서 8 (mpi 실행, swan4151에서 실행하면 안됨)
 mpirun -np 2 ./swan.exe
 
 순서 9 (test 파일 다운로드)
