@@ -2,6 +2,7 @@
 테스트용 서버 정보
 서버 : DELL R6625
 운영체제 : Rocky 8.9
+소요시간 : 10시간
 참고 사이트 : https://geosx-geosx.readthedocs-hosted.com/en/latest/docs/sphinx/QuickStart.html#repository-organization
 ---------------------------------------------------------------------------------------------------------------------------------------------
 1. GEOS 다운
