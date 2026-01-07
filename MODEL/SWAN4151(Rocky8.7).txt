@@ -1,5 +1,5 @@
-SWAN Model Site URL : https://swanmodel.sourceforge.io/
-SWAN Model Download URL : https://swanmodel.sourceforge.io/download/zip/swan4151.tar.gz
+SWAN Model 홈페이지 링크 : https://swanmodel.sourceforge.io/
+SWAN Model 다운로드 링크 : https://swanmodel.sourceforge.io/download/zip/swan4151.tar.gz
 운영체제 : Rocky 8.7
 소요시간 : 2시간
 
