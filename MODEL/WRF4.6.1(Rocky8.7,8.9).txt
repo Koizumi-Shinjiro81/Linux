@@ -1,8 +1,9 @@
+기상 예측, 분석하는 수치기상모델
 WRF 홈페이지 링크 : https://github.com/wrf-model/WRF/tree/v4.6.1
 WRF 다운로드 링크 : wget https://github.com/wrf-model/WRF/releases/download/v4.6.1/v4.6.1.tar.gz
 WRF 서브모듈 명령어 : git clone --recurse-submodules https://github.com/wrf-model/WRF.git WRF-4.6.1
 운영체제 : Rocky 8.7, Rocky 8.9
-소요시간 : 9시30분시작
+소요시간 : 2시간
 
 순서 1 (모듈 불러오기)
 

@@ -1,4 +1,6 @@
+지구과학 연구 및 관측 분석 모델
 GEOS 홈페이지 링크 : https://geosx-geosx.readthedocs-hosted.com/en/latest/docs/sphinx/QuickStart.html#repository-organization
+필수 패키지 : dnf install git-lfs
 GEOS 다운로드 링크 : git clone https://github.com/GEOS-DEV/GEOS.git GEOS
 GEOS 추가 명령어 : cd GEOS, git lfs install, git submodule init, git submodule update
 thirdPartyLibs 다운로드 링크 : git clone https://github.com/GEOS-DEV/thirdPartyLibs.git thirdPartyLibs
