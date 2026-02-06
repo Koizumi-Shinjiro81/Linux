@@ -1,0 +1,186 @@
+ssh 업데이트 관련
+
+[root@node00 ~]# cat /etc/redhat-release 
+Rocky Linux release 9.3 (Blue Onyx)
+[root@node00 ~]# rpm -qa | grep -i openssh
+openssh-8.7p1-34.el9.x86_64
+openssh-clients-8.7p1-34.el9.x86_64
+openssh-server-8.7p1-34.el9.x86_64
+
+[root@deno00 ~]# cat /etc/redhat-release 
+CentOS release 6.8 (Final)
+[root@deno00 ~]# rpm -qa | grep -i openssh
+openssh-server-5.3p1-117.el6.x86_64
+openssh-5.3p1-117.el6.x86_64
+openssh-clients-5.3p1-117.el6.x86_64
+openssh-askpass-5.3p1-117.el6.x86_64
+
+CentOS 6.8에 openssh 5.3p1를 7.3p1로 업데이트 할려고 생각
+which sshd
+which ssh
+ss -tnlp | grep ssh
+
+파일 다운로드 (openssl, openssh)
+cd /usr/local/src
+wget https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-7.3p1.tar.gz
+wget https://www.openssl.org/source/old/1.0.1/openssl-1.0.1t.tar.gz
+tar zxvf openssl-1.0.1t.tar.gz
+tar zxvf openssh-7.3p1.tar.gz
+
+openssl 컴파일
+./config shared \
+  --prefix=/usr/local/openssl-1.0.1t \
+  --openssldir=/usr/local/openssl-1.0.1t
+
+openssl 메이크
+make
+make install
+
+openssl 설치확인
+/usr/local/openssl-1.0.1t/bin/openssl version
+ls -l /usr/local/openssl-1.0.1t/lib/libcrypto.so*
+ls -l /usr/local/openssl-1.0.1t/lib/libssl.so*
+
+openssl 경로 매핑같은디
+[root@deno00 openssh-7.3p1]# echo "/usr/local/openssl-1.0.1t/lib" > /etc/ld.so.conf.d/openssl-1.0.1t.conf
+[root@deno00 openssh-7.3p1]# ldconfig
+[root@deno00 openssh-7.3p1]# 
+[root@deno00 openssh-7.3p1]# ldconfig -p | grep libcrypto.so.1.0.0
+	libcrypto.so.1.0.0 (libc6,x86-64) => /usr/local/openssl-1.0.1t/lib/libcrypto.so.1.0.0
+
+### openssh 설치하다가 잘안될때참고
+[root@deno00 openssh-7.3p1]# ls -l /usr/local/openssl-1.0.1t/include/openssl/opensslv.h
+-rw-r--r-- 1 root root 3939 Feb  7 01:53 /usr/local/openssl-1.0.1t/include/openssl/opensslv.h
+[root@deno00 openssh-7.3p1]# cd /usr/local/src/openssh-7.3p1
+[root@deno00 openssh-7.3p1]# make distclean 2>/dev/null || make clean 2>/dev/null
+[root@deno00 openssh-7.3p1]# rm -f config.cache
+[root@deno00 openssh-7.3p1]# export CPPFLAGS="-I/usr/local/openssl-1.0.1t/include"
+[root@deno00 openssh-7.3p1]# export LDFLAGS="-L/usr/local/openssl-1.0.1t/lib"
+
+openssh 컴파일 (헤더파일 존재)
+오류뜨면 환경변수 잡고 진행
+CPPFLAGS="-I/usr/local/openssl-1.0.1t/include" \
+LDFLAGS="-L/usr/local/openssl-1.0.1t/lib" \
+./configure \
+  --prefix=/usr/local/openssh/7.3p1 \
+  --sysconfdir=/etc/ssh \
+  --with-ssl-dir=/usr/local/openssl/1.0.1t \
+  --with-zlib \
+  --with-md5-passwords \
+  --with-pam
+
+make
+
+make install이 잘안되서
+vi /etc/ssh/sshd_config 파일내에
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPIAuthentication yes
+#GSSAPICleanupCredentials yes
+#GSSAPICleanupCredentials yes
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+ 주석 설정후 나옴
+설정파일 잘설정됐는지 확인명령어
+/usr/local/openssh-7.3p1/sbin/sshd -t -f /etc/ssh/sshd_config
+echo $?
+
+ssh잘되는지 확인 명령어
+ls -l /usr/local/openssh-7.3p1/sbin/sshd
+/usr/local/openssh-7.3p1/bin/ssh -V
+/usr/local/openssh-7.3p1/sbin/sshd -V
+
+설치다 잘됐음
+여기서 기존 ssh를 .old붙혀서 놔두고 새로운걸로 덮어야함
+있는지 확인 명령어
+[root@deno00 openssh-7.3p1]# ls /usr/bin/ssh
+/usr/bin/ssh
+[root@deno00 openssh-7.3p1]# ls /usr/bin/scp
+/usr/bin/scp
+[root@deno00 openssh-7.3p1]# ls /usr/bin/sftp
+/usr/bin/sftp
+[root@deno00 openssh-7.3p1]# ls /usr/sbin/sshd
+/usr/sbin/sshd
+
+설치된파일들 위치
+[root@deno00 sbin]# ls /usr/local/openssh-7.3p1/bin/ssh
+/usr/local/openssh-7.3p1/bin/ssh
+[root@deno00 sbin]# ls /usr/local/openssh-7.3p1/bin/scp
+/usr/local/openssh-7.3p1/bin/scp
+[root@deno00 sbin]# ls /usr/local/openssh-7.3p1/bin/sftp 
+/usr/local/openssh-7.3p1/bin/sftp
+[root@deno00 sbin]# ls /usr/local/openssh-7.3p1/sbin/sshd 
+/usr/local/openssh-7.3p1/sbin/sshd
+
+기존파일 이름변경
+mv /usr/bin/ssh /usr/bin/ssh.old
+mv /usr/bin/scp /usr/bin/scp.old
+mv /usr/bin/sftp /usr/bin/sftp.old
+mv /usr/sbin/sshd /usr/sbin/sshd.old
+
+설치한 파일들 심볼릭링크로 교체
+ln -s /usr/local/openssh-7.3p1/bin/ssh /usr/bin/ssh
+ln -s /usr/local/openssh-7.3p1/bin/scp /usr/bin/scp
+ln -s /usr/local/openssh-7.3p1/bin/sftp /usr/bin/sftp
+ln -s /usr/local/openssh-7.3p1/sbin/sshd /usr/sbin/sshd
+
+서비스 재시작전에 잘되는지 확인 0이나와야 됨
+/usr/sbin/sshd -t
+echo $?
+
+서비스 재시작
+service sshd restart (여기서 stop에서 문제가있다 그러면 pkill로 없애고 다시)
+pkill sshd
+rm -f /var/run/sshd.pid
+
+sshd_config 파일을 /etc/ssh/sshd_config 설정파일 옮김
+[root@deno00 openssh-7.3p1]# vi sshd_config
+[root@deno00 openssh-7.3p1]# vi /etc/ssh/sshd_config 
+[root@deno00 openssh-7.3p1]# mv /etc/ssh/sshd_config /etc/ssh/sshd_config.old
+[root@deno00 openssh-7.3p1]# pwd
+/usr/local/src/openssh-7.3p1
+[root@deno00 openssh-7.3p1]# mv ./sshd_config /etc/ssh/
+[root@deno00 openssh-7.3p1]# ls /etc/ssh/sshd_config
+/etc/ssh/sshd_config
+
+안하는게 좋은듯 일단 알고잇으셈 설정파일도 안바꾸는게 맞아보일수도 설정파일에서 수정하는게 좋음 yes설정
+     83 # GSSAPI options
+     84 GSSAPIAuthentication yes
+     85 #GSSAPICleanupCredentials yes
+
+
+REPO EOL로 인한 REPO생성
+vi /etc/yum.repos.d/CentOS-Vault.repo
+
+[base]
+name=CentOS-6.10 - Base
+baseurl=http://vault.centos.org/6.10/os/$basearch/
+gpgcheck=0
+enabled=1
+
+[updates]
+name=CentOS-6.10 - Updates
+baseurl=http://vault.centos.org/6.10/updates/$basearch/
+gpgcheck=0
+enabled=1
+
+[extras]
+name=CentOS-6.10 - Extras
+baseurl=http://vault.centos.org/6.10/extras/$basearch/
+gpgcheck=0
+enabled=1
+
+yum clean all
+yum repolist
+
+gcc없으면 설치
+yum install -y gcc gcc-c++ make
+
+zlib-devel 없어서 오류
+yum install -y zlib-devel
+
+pam-devel도설치했음
+yum install -y pam-devel
+
+서비스할때 경로를 openssh랑 openssl경로로 설정하기
+둘다 소스파일로 받기
