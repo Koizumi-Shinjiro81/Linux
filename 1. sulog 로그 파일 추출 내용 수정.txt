@@ -1,0 +1,22 @@
+1. sulog 로그 파일 추출 내용 수정
+vi /etc/logrotate.d/sulog 내용 확인 후 수정
+
+/var/log/sulog
+{
+    monthly				#한달에 한번
+    rotate 1				#파일 개수 1개
+    missingok			
+    dateext				#파일에 날짜 추가
+    dateformat -%Y%m%d	#날짜 형식 지정
+    create 0644 root root	#로테이션 후 sulog 재생성
+    su root root
+}
+
+2. 리눅스 타임아웃 세션 적용 및 수정
+vi /etc/profile
+export TMOUT=600
+
+vi /etc/profile 내용안에 export TMOUT=600 내용 추가 및 값 변경
+
+쉘에 바로 적용
+source /etc/profile
