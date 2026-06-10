@@ -1,0 +1,20 @@
+#### 스크립트 설명
+cp -r files/jspcmds_ssh ${PREFIX}/jspcmds
+cp -f ${PREFIX}/src/tmp/hostlist ${PREFIX}/jspcmds/include/hostlist
+vim ${PREFIX}/jspcmds/include/hostlist
+cp -rf files/hpcstat/files/hpcstat.sh ${PREFIX}/hpcstat
+rpm -Uvh files/rpms/8/shc-4.0.3-1.el8.x86_64.rpm >& /dev/null
+/usr/bin/shc -f ${PREFIX}/hpcstat/hpcmon.sh >& /dev/null
+/usr/bin/shc -f ${PREFIX}/hpcstat/hpcstat.sh >& /dev/null
+gcc ${PREFIX}/hpcstat/hpcmon.sh.x.c -o ${PREFIX}/hpcstat/hpcmon
+gcc ${PREFIX}/hpcstat/hpcstat.sh.x.c -o ${PREFIX}/hpcstat/hpcstat
+rm -rf ${PREFIX}/hpcstat/hpcstat.sh ${PREFIX}/hpcstat/hpcstat.sh.x.c ${PREFIX}/hpcstat/hpcstat.sh.x
+rm -rf ${PREFIX}/hpcstat/hpcmon.sh ${PREFIX}/hpcstat/hpcmon.sh.x.c ${PREFIX}/hpcstat/hpcmon.sh.x
+ln -sf ${PREFIX}/hpcstat/hpcstat ${PREFIX}/bin/hpcstat
+echo "* * * * * bash -l ${PREFIX}/jspcmds/jspexec ${PREFIX}/hpcstat/hpcmon" >> /var/spool/cron/root
+chmod 600 /var/spool/cron/root
+
+#### 수동설치 명령어
+
+
+

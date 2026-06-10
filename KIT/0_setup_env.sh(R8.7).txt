@@ -1,0 +1,147 @@
+#### 스크립트 설명
+OS_check (function.env) #OS 체크하는 함수
+SET_prefix (function.env) #prefix = /usr/local 함수
+
+if [ -f ${PREFIX}/src/tmp/hostlist ] #hosts 파일 수정 및 설정 함수
+then
+        echo "^[[31m[ Found hostlist file!! ]^[[0m"
+else
+        echo ""
+        mkdir -p ${PREFIX}/src/tmp
+        clear
+        echo "^[[31m[ Edit /etc/hosts!! ]^[[0m"
+        sleep 2
+        vi /etc/hosts
+        echo ""
+        echo "^[[31m[ Making temp hostlist file!! ]^[[0m"
+        sleep 2
+        vi ${PREFIX}/src/tmp/hostlist
+        cp ${PREFIX}/src/tmp/hostlist ${PREFIX}/src/tmp/compute_hostlist
+        sed -i "/${HOSTNAME}/d" ${PREFIX}/src/tmp/compute_hostlist
+        echo ""
+fi
+
+ROCKY8_SET_env (function.env) #기본적인 파일 설정 및 /etc/.setup/KIT/files 경로의 파일 복사
+ROCKY8_OFF_LINE_PACKAGE_INSTALL (function.env) #/etc/.setup/KIT/files/rpms/R8 경로 rpm 파일들 설치, 설정파일 복사, 심볼릭 링크 설정
+ROCKY8_SERVICE_SETTING (function.env) #/etc/.setup/KIT/files/etc/8 경로 systemd_off, systemd_on 내용 서비스 종료 및 시작
+OPENPBS_MASTER_INSTALL (function.env) #OPENPBS 22.05 설치
+
+#### 수동설치 명령어
+export PREFIX=/usr/local
+echo "${PREFIX}" > /var/tmp/prefix
+	↑경로의 파일이 없어서 실행이 안될경우
+	mkdir -p ${PREFIX}
+
+cat /etc/redhat-release
+
+mkdir -p ${PREFIX}/src/tmp
+vi /etc/hosts
+vi ${PREFIX}/src/tmp/hostlist
+cp ${PREFIX}/src/tmp/hostlist ${PREFIX}/src/tmp/compute_hostlist
+sed -i "/${HOSTNAME}/d" ${PREFIX}/src/tmp/compute_hostlist
+
+##ROCKY8_SET_env (function.env)
+setenforce 0
+cp -f files/etc/selinux_config /etc/selinux/config
+cp -f files/etc/vsftpd.conf /etc/vsftpd/vsftpd.conf
+cp -f files/etc/custom.conf /etc/gdm/custom.conf
+cp -f files/shell/pcilist.pl /bin
+echo "#${PREFIX}       node*(rw,async,no_root_squash,no_all_squash,no_subtree_check)" > /etc/exports
+chmod u+x /etc/rc.d/rc.local
+systemctl start rc-local
+sed -i s/TimeoutSec=0/TimeoutSec=5/g /usr/lib/systemd/system/rc-local.service
+cp files/etc/ignore-systemd-session-slice.conf /etc/rsyslog.d/
+systemctl restart rsyslog.service
+cp files/etc/sysctl.hanul /etc/sysctl.d/hanul.conf
+cp -f files/vnc/*vnc /bin
+cp -f files/vnc/vncview /bin
+cp -f files/vnc/vnc-E4_5-x64_linux_viewer /bin
+cp -f files/shell/hanul.* /etc/profile.d/
+source /etc/profile.d/hanul.sh
+unalias cp
+cp -rf files/test_src ${PREFIX}/src
+cat files/shell/sudoers_addon >> /etc/sudoers
+sed -i 's/\# threads=8/threads=16/g' /etc/nfs.conf
+cp -f files/etc/limits.conf /etc/security
+cp -f files/etc/8/nvtop ${PREFIX}/bin
+cp -f files/etc/collect_report.sh /usr/bin/
+unlink /etc/motd.d/cockpit
+yum config-manager --set-enabled powertools
+cat /files/etc/vimrc >> /etc/vimrc
+
+##ROCKY8_OFF_LINE_PACKAGE_INSTALL (function.env)
+yum --disablerepo=* install -y files/rpms/R8/*.rpm
+sh files/vnc/vncpasswd.sh
+echo "exclude=kernel*" >> /etc/yum.conf
+cp -f files/etc/8/chrony.conf /etc
+systemctl restart chronyd
+cp -f files/etc/8/crond /etc/sysconfig/
+systemctl restart crond.service
+ln -s /usr/include/tirpc/rpc/rpc.h /usr/include/rpc/rpc.h
+ln -s /usr/include/tirpc/rpc/types.h /usr/include/rpc/types.h
+ln -s /usr/include/tirpc/netconfig.h /usr/include/netconfig.h
+ln -s /usr/include/tirpc/rpc/xdr.h /usr/include/rpc/xdr.h
+ln -s /usr/include/tirpc/rpc/auth.h /usr/include/rpc/auth.h
+ln -s /usr/include/tirpc/rpc/clnt_stat.h /usr/include/rpc/clnt_stat.h
+ln -s /usr/include/tirpc/rpc/clnt.h /usr/include/rpc/clnt.h
+ln -s /usr/include/tirpc/rpc/clnt_soc.h /usr/include/rpc/clnt_soc.h
+ln -s /usr/include/tirpc/rpc/rpc_msg.h /usr/include/rpc/rpc_msg.h
+ln -s /usr/include/tirpc/rpc/auth_unix.h /usr/include/rpc/auth_unix.h
+ln -s /usr/include/tirpc/rpc/auth_des.h /usr/include/rpc/auth_des.h
+ln -s /usr/include/tirpc/rpc/svc_auth.h /usr/include/rpc/svc_auth.h
+ln -s /usr/include/tirpc/rpc/svc.h /usr/include/rpc/svc.h
+ln -s /usr/include/tirpc/rpc/svc_soc.h /usr/include/rpc/svc_soc.h
+ln -s /usr/include/tirpc/rpc/pmap_clnt.h /usr/include/rpc/pmap_clnt.h
+ln -s /usr/include/tirpc/rpc/pmap_prot.h /usr/include/rpc/pmap_prot.h
+ln -s /usr/include/tirpc/rpc/rpcb_clnt.h /usr/include/rpc/rpcb_clnt.h
+ln -s /usr/include/tirpc/rpc/rpcb_prot.h /usr/include/rpc/rpcb_prot.h
+ln -s /usr/include/tirpc/rpc/svc_mt.h /usr/include/rpc/svc_mt.h
+ln -s /usr/include/tirpc/rpc/rpcent.h /usr/include/rpc/rpcent.h
+ln -s /usr/include/freetype2/ft2build.h /usr/include
+ln -s /usr/include/freetype2/freetype /usr/include/freetype
+cp -f files/vnc/8/46-allow-update-repo.pkla /etc/polkit-1/localauthority/50-local.d/
+cp -f files/vnc/8/vncserver-config-defaults /etc/tigervnc/
+cp -f files/vnc/8/vncserver.users /etc/tigervnc/
+echo "export MODULEPATH=${PREFIX}/modulefiles:${MODULEPATH}" >> /etc/profile.d/modules.sh
+echo "setenv MODULEPATH ${PREFIX}/modulefiles:${MODULEPATH}" >> /etc/profile.d/modules.csh
+
+##ROCKY8_SERVICE_SETTING (function.env)
+systemctl stop alsa-state
+systemctl disable alsa-state
+systemctl stop bluetooth
+systemctl disable bluetooth
+systemctl stop postfix
+systemctl disable postfix
+systemctl stop libvirtd
+systemctl disable libvirtd
+systemctl stop blk-availability
+systemctl disable blk-availability
+systemctl stop avahi-daemon.service
+systemctl disable avahi-daemon.service
+systemctl stop avahi-daemon.socket
+systemctl disable avahi-daemon.socket
+systemctl stop firewalld
+systemctl disable firewalld
+systemctl enable nfs-server
+systemctl restart nfs-server
+systemctl enable chronyd
+systemctl restart chronyd
+systemctl enable vsftpd
+systemctl restart vsftpd
+systemctl enable cups
+systemctl restart cups
+systemctl enable tuned
+systemctl restart tuned
+tuned-adm profile throughput-performance
+systemctl restart tuned
+
+##OPENPBS_MASTER_INSTALL (function.env)
+read OPENPBS
+rpm -Uvh files/pbs/openpbs_22.05.11.rockylinux_8.5/openpbs-server-22.05.11-0.x86_64.rpm
+rpm -Uvh files/pbs/openpbs_22.05.11.rockylinux_8.5/openpbs-devel-22.05.11-0.x86_64.rpm
+sed -i 's/PBS_START_MOM=0/PBS_START_MOM=1/g' /etc/pbs.conf
+systemctl start pbs
+systemctl enable pbs
+/opt/pbs/bin/qmgr -c "s s job_history_enable=True"
+/opt/pbs/bin/qmgr -c "s s flatuid=True"
+/opt/pbs/bin/qmgr -c "p s"
