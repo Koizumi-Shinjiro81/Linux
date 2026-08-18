@@ -1,6 +1,7 @@
 우분투 설치시 참고사항
 
 ufw disable ##우분투 방화벽 끄기
+lsb_release -a ##우분투 설치 버전 확인 명령어
 apt update ## 설치관련 패키지, 레포지토리 업데이트
 apt-get install ssh* ##ssh 관련 패키지 설치
 systemctl restart sshd ##ssh 서비스 시작
