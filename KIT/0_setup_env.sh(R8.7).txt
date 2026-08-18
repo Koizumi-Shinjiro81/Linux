@@ -36,16 +36,17 @@ cat /etc/redhat-release
 
 mkdir -p ${PREFIX}/src/tmp
 vi /etc/hosts
+mkdir /usr/local/src/tmp
 vi ${PREFIX}/src/tmp/hostlist
 cp ${PREFIX}/src/tmp/hostlist ${PREFIX}/src/tmp/compute_hostlist
 sed -i "/${HOSTNAME}/d" ${PREFIX}/src/tmp/compute_hostlist
 
 ##ROCKY8_SET_env (function.env)
 setenforce 0
-cp -f files/etc/selinux_config /etc/selinux/config
-cp -f files/etc/vsftpd.conf /etc/vsftpd/vsftpd.conf
-cp -f files/etc/custom.conf /etc/gdm/custom.conf
-cp -f files/shell/pcilist.pl /bin
+\cp -f files/etc/selinux_config /etc/selinux/config
+\cp -f files/etc/vsftpd.conf /etc/vsftpd/vsftpd.conf
+\cp -f files/etc/custom.conf /etc/gdm/custom.conf
+\cp -f files/shell/pcilist.pl /bin
 echo "#${PREFIX}       node*(rw,async,no_root_squash,no_all_squash,no_subtree_check)" > /etc/exports
 chmod u+x /etc/rc.d/rc.local
 systemctl start rc-local
@@ -67,7 +68,7 @@ cp -f files/etc/8/nvtop ${PREFIX}/bin
 cp -f files/etc/collect_report.sh /usr/bin/
 unlink /etc/motd.d/cockpit
 yum config-manager --set-enabled powertools
-cat /files/etc/vimrc >> /etc/vimrc
+cat files/etc/vimrc >> /etc/vimrc
 
 ##ROCKY8_OFF_LINE_PACKAGE_INSTALL (function.env)
 yum --disablerepo=* install -y files/rpms/R8/*.rpm

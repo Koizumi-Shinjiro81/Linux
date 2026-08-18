@@ -1,0 +1,33 @@
+우분투 설치시 참고사항
+
+ufw disable ##우분투 방화벽 끄기
+apt update ## 설치관련 패키지, 레포지토리 업데이트
+apt-get install ssh* ##ssh 관련 패키지 설치
+systemctl restart sshd ##ssh 서비스 시작
+systemctl enable sshd ##부팅시 ssh 서비스 자동 사직
+apt install -y build-essential dkms linux-headers-$(uname -r) ##gpu 드라이버 설치전 repo 설치 및 관련 의존성패키지 설치
+ubuntu-drivers devices
+apt install -y nvidia-driver-595-open ##그래픽 드라이버 설치 (버전이 다를수있음)
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2604/x86_64/cuda-keyring_1.1-1_all.deb ## cuda 설치방법
+dpkg -i cuda-keyring_1.1-1_all.deb
+apt-get update
+apt-get -y install cuda-toolkit-13-3
+
+##cuda 관련 환경파일 설정
+cat << 'EOF' > /etc/profile.d/cuda.sh
+#!/bin/bash
+export CUDA_HOME=/usr/local/cuda
+export NVHPC_CUDA_HOME=/usr/local/cuda
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:${LD_LIBRARY_PATH}
+export PATH=/usr/local/cuda/bin:${PATH}
+EOF
+
+cat << 'EOF' > /etc/profile.d/cuda.csh
+#!/bin/csh
+setenv CUDA_HOME /usr/local/cuda
+setenv NVHPC_CUDA_HOME /usr/local/cuda
+setenv LD_LIBRARY_PATH /usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64
+setenv PATH /usr/local/cuda/bin:${PATH}
+EOF
+
+chmod +x /etc/profile.d/cuda.sh /etc/profile.d/cuda.csh
