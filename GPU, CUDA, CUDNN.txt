@@ -1,0 +1,93 @@
+https://download.nvidia.com/XFree86/Linux-x86_64/
+https://developer.nvidia.com/cuda/toolkit
+https://developer.nvidia.com/cudnn
+
+1. nouveau 블랙리스트 등록
+cat > /etc/modprobe.d/blacklist-nouveau.conf <<'EOF'
+blacklist nouveau
+options nouveau modeset=0
+EOF
+
+2. GRUB 커널 옵션 등록
+grubby --update-kernel=ALL --args="rd.driver.blacklist=nouveau modprobe.blacklist=nouveau nouveau.modeset=0"
+
+3. initramfs 재생성
+dracut --force
+
+4. 재부팅
+reboot
+
+5. nouveau 비활성화 확인
+lsmod | grep nouveau
+cat /proc/cmdline
+
+5-1. 현재 GUI 부팅 설정 확인
+systemctl get-default
+
+6. NVIDIA 드라이버 설치 준비
+dnf install -y gcc make perl dkms elfutils-libelf-devel \
+kernel-devel-$(uname -r) kernel-headers
+
+6-1 dkms만 설치
+dnf install -y --setopt=install_weak_deps=False \
+--setopt=best=False dkms
+
+6-2. 설치된 커널과 개발 패키지 확인
+uname -r
+rpm -q kernel-devel
+
+7. GUI를 일시적으로 종료하고 드라이버 설치
+systemctl isolate multi-user.target
+chmod +x NVIDIA-Linux-x86_64-*.run
+./NVIDIA-Linux-x86_64-*.run --dkms
+
+7-1. 설치버튼
+MIT/GPL -> yes(32-bit) -> yes -> OK -> Rebuild initramfs -> OK
+
+7-2. 재부팅
+reboot
+
+7-3. Driver 확인
+nvidia-smi
+dkms status
+
+7-4. GUI 확인
+systemctl get-default
+systemctl status display-manager
+
+7-5 GPU 펌웨어를 불러오지 못하는 증상 발견
+# cp -a /boot/initramfs-$(uname -r).img \
+/boot/initramfs-$(uname -r).img.bak
+# ls -lh /boot/initramfs-$(uname -r).img*
+# cat > /etc/dracut.conf.d/90-nvidia-firmware.conf <<'EOF'
+install_items+=" /usr/lib/firmware/nvidia/615.78.08/gsp_ga10x.bin /usr/lib/firmware/nvidia/615.78.08/ucodes_ga10x.bin "
+EOF
+# dracut --force /boot/initramfs-$(uname -r).img $(uname -r)
+# lsinitrd /boot/initramfs-$(uname -r).img | grep 'nvidia/615.78.08/'
+# reboot
+# $7-3
+
+8. CUDA 설치
+chmod +x cuda_13.4.3_linux.run
+sh cuda_13.4.3_linux.run --toolkit
+
+8-1. 설치버튼
+accept -> install
+
+9. CUDA 환경변수 설정
+### cuda.sh , cuda.csh
+cat << EOF > /etc/profile.d/cuda.sh
+#!/bin/bash
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:\$LD_LIBRARY_PATH
+export CUDA_HOME=/usr/local/cuda
+export NVHPC_CUDA_HOME=/usr/local/cuda
+export PATH=/usr/local/cuda/bin:\$PATH 
+EOF
+
+cat << EOF > /etc/profile.d/cuda.csh
+#!/bin/csh
+setenv LD_LIBRARY_PATH /usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64
+setenv CUDA_HOME /usr/local/cuda
+setenv NVHPC_CUDA_HOME /usr/local/cuda
+setenv PATH /usr/local/cuda/bin:\$PATH
+EOF

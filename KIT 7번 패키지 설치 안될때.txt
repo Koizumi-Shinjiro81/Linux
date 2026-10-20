@@ -1,0 +1,1 @@
+dnf localinstall *.rpm

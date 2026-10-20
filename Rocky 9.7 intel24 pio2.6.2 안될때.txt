@@ -1,0 +1,98 @@
+Rocky 9.7 intel24 pio2.6.2 안될때
+
+export PREFIX=/usr/local
+export PIO=pio-2.6.2
+export INTELVER=24
+export MPI1=mpich-4.1.2
+export INTEL_COM_ROAD="/usr/local/intel/oneapi/compiler/latest/env/vars.sh"
+export NETCDF6_VER=4.9.2
+export PNETCDF_VER=1.14.0
+export PIO_VER=2.6.2
+
+tar xfz ${PIO}.tar.gz
+                        cd ${PIO}
+                        mkdir -p build/src/flib
+                        cp -rf CMake_Fortran_utils build/
+                        cp -rf Makefile build/
+                        cp -rf genf90 build/src/flib/
+                        cd build
+
+[root@node00 KIT.el9]# cat ~/.bash_profile 
+
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+############### Intel Compiler Setting Part ################
+#@@@ Intel(R) oneAPI Base Toolkit & HPC Toolkit (Include Intel Compiler & MPI $ MKL)
+source /usr/local/intel/oneapi/compiler/latest/env/vars.sh		## Intel Compiler 2024
+source /usr/local/intel/oneapi/mpi/latest/env/vars.sh		        ## Intel MPI 2021
+#source /usr/local/intel/oneapi/mkl/latest/env/vars.sh		        ## Intel MKL 2024
+export MPICH=/usr/local/mpi/intel24/mpich-4.1.2   			## MPICH-4.1.2
+#export MPICH=/usr/local/mpi/intel24/openmpi-5.0.0      		## OpenMPI-5.0.0
+export HDF5=/usr/local/hdf5/1.13.2_intel24             		## HDF5-1.13.2
+export NETCDF=/usr/local/netcdf/4.9.2_intel24          		## NetCDF-4.9.2 with NetCDF-Fortran-4.6.2
+export PNETCDF=/usr/local/pnetcdf/1.14.0_intel24_mpich-4.1.2  		## Parallel-NetCDF-1.14.0 with mpich-4.1.2
+#export PIO=/usr/local/pio/2.6.2_intel24_mpich-4.1.2           		## Parallel IO-2.6.2 with mpich-4.1.2
+#export IOAPI=/usr/local/ioapi/3.2/Linux2_x86_64ifort           	## IOAPI-3.2
+############################################################
+
+############## NVIDIA Compiler Setting Part ################
+#@@@ NVIDIA HPC SDK (include PGI Compiler & CUDA & MATH LIB & OpenMPI)
+#source /usr/local/nvidia/hpc_sdk/Linux_x86_64/2024/compilers/bin/nv.sh ## NVIDIA(aka PGI) Compiler 2024
+#export MPICH=/usr/local/mpi/nv24/mpich-4.1.2         	  		## MPICH-4.1.2
+#export MPICH=/usr/local/mpi/nv24/openmpi-5.0.0      			## OpenMPI-5.0.0
+#export HDF5=/usr/local/hdf5/1.13.2_nv24             			## HDF5-1.13.2
+#export NETCDF=/usr/local/netcdf/4.9.2_nv24        	   		## NetCDF-4.9.2 with NetCDF-Fortran-4.6.2
+#export PNETCDF=/usr/local/pnetcdf/1.14.0_nv24_mpich-4.1.2  		## Parallel-NetCDF-1.14.0 with mpich-4.1.2
+#export PIO=/usr/local/pio/2.6.2_nv24_mpich-4.1.2       		## Parallel IO-2.6.2 with mpich-4.1.2
+#export IOAPI=/usr/local/ioapi/3.2/Linux2_x86_64pg              	## IOAPI-3.2
+############################################################
+
+############# GCC Compiler Setting Part ####################
+#export MPICH=/usr/local/mpi/gcc11/mpich-4.1.2         			## MPICH-4.1.2
+#export MPICH=/usr/local/mpi/gcc11/openmpi-5.0.0      			## OpenMPI-5.0.0
+#export HDF5=/usr/local/hdf5/1.13.2_gcc11				## HDF5-1.13.2
+#export NETCDF=/usr/local/netcdf/4.9.2_gcc11     			## NetCDF-4.9.2 with NetCDF-Fortran-4.6.2
+############################################################
+
+############### The Others Setting Part ####################
+#export NCARG_ROOT=/usr/local/ncl_ncarg/6.6.2_gcc485  			## Ncl_ncarg-6.6.2 EL7 pre-compiled ver.
+#export GrADS=/usr/local/grads/2.2.1.oga.1           			## OpenGrads-2.2.1.oga.1 pre-compiled ver.
+#export GADDIR=/usr/local/grads/2.2.1.oga.1/data        		## OpenGrads-2.2.1.oga.1 Fonts, etc.
+
+#export NCVIEW=/usr/local/ncview/2.1.4_gcc11				## NCView-2.1.4
+#export NCO=/usr/local/nco/4.8.0_gcc11					## NCO-4.8.0
+#export HDFVIEW=/usr/local/HDFView/2.10.1				## HDFView-2.10.1
+#export GMT=/usr/local/gmt/6.5.0					## GMT-6.5.0
+#source /usr/local/ferret/6.93/ferret_paths.sh				## ferret-6.93
+#export CDO=/usr/local/cdo/1.9.3_gcc11					## CDO-1.9.3
+
+#export JASPER=/usr/local/jasper/1.900.1_gcc11				## jasper-1.900.1
+#export JASPERINC=$JASPER/include                       		## jasper include PATH
+#export JASPERLIB=$JASPER/lib                           		## jasper library PATH
+#export GEOS=/usr/local/geos/3.13.1_gcc11				## geos-3.13.1 EL9 pre-compiled ver.
+#export PROJ=/usr/local/proj/8.2.0_gcc11				## proj-8.2.0 EL9 pre-compiled ver.
+#export GDAL=/usr/local/gdal/3.4.3_gcc11				## gdal-3.4.3 EL9 pre-compiled ver.
+###########################################################
+
+#export PATH=${PATH}:${IOAPI}:${HOME}/bin:.:~:
+#export MANPATH=${MANPATH}
+
+#for i in $MPICH $NETCDF $PNETCDF $PIO $NCARG_ROOT $GrADS $HDF4 $HDF5 $NCO $NCVIEW $HDFVIEW $GEOS $PROJ $GDAL $GMT $CDO ; do
+#  if [ ! -z $i ]; then
+#    if [ -d $i/bin ]; then export PATH=$i/bin:$PATH ; fi
+#    if [ -d $i/lib ]; then export LD_LIBRARY_PATH=$i/lib:$LD_LIBRARY_PATH ; fi
+#    if [ -d $i/sbin -a `id -u` = 0 ]; then export PATH=$i/sbin:$PATH ; fi
+#    if [ -d $i/man ]; then export MANPATH=$MANPATH:$i/man ; fi
+#  fi
+#done
+#unset i
+
+CC=mpicc FC=mpif90 cmake .. -DNetCDF_C_PATH=$PREFIX/netcdf/${NETCDF6_VER}_intel$INTELVER -DNetCDF_Fortran_PATH=$PREFIX/netcdf/${NETCDF6_VER}_intel$INTELVER -DPnetCDF_PATH=$PREFIX/pnetcdf/${PNETCDF_VER}_intel${INTELVER}_$MPI1 -DCMAKE_INSTALL_PREFIX=$PREFIX/pio/${PIO_VER}_intel${INTELVER}_$MPI1
+make -j 4
+make install
