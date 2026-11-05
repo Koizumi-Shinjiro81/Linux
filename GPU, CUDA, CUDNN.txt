@@ -91,3 +91,11 @@ setenv CUDA_HOME /usr/local/cuda
 setenv NVHPC_CUDA_HOME /usr/local/cuda
 setenv PATH /usr/local/cuda/bin:\$PATH
 EOF
+
+10. CUDNN 설치
+cd /usr/local/src
+wget remote.hanulsol.com:9803/cudnn/cudnn-linux-x86_64-9.18.1.3_cuda13-archive.tar.xz
+tar xvf cudnn-linux-x86_64-9.18.1.3_cuda13-archive.tar.xz
+cd cudnn-linux-x86_64-9.18.1.3_cuda13-archive
+cp -a include/* /usr/local/cuda-13.0/include
+cp -a lib/* /usr/local/cuda-13.0/lib64

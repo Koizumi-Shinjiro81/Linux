@@ -40,8 +40,18 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sh Miniconda3-latest-Linux-x86.sh
 Enter
 yes
-/usr/local/miniconda3
+/usr/local/miniconda3/버전/
 yes
-cp /usr/local/miniconda3/etc/profile.d/conda.sh /etc/profile.d/
+cp /usr/local/miniconda3/버전/etc/profile.d/conda.sh /etc/profile.d/
+
+#버전 확인방법
+설치시 아래 처럼 나옴
+[root@ngen-cmor GPU]# sh Miniconda3-latest-Linux-x86_64.sh 
+
+Welcome to Miniconda3 py314_26.9.3-0 #####26.9.3 이런식으로 나옴 이거 넣으면됨
+
+In order to continue the installation process, please review the license
+agreement.
+Please, press ENTER to continue
 
 ##AnaConda Install
