@@ -23,3 +23,29 @@ CC=mpicc FC=mpif90 cmake .. -DNetCDF_C_PATH=$PREFIX/netcdf/${NETCDF6_VER}_intel$
 make -j4 && make install
 unset CC FC
 export HDF5=$HDF5_TEMP
+
+Rocky 9.7
+/usr/local/pio/2.6.2_intel24_mvapich-4.0
+
+tar xfz pio-2.6.2.tar.gz
+cd pio-2.6.2/
+mkdir -p build/src/flib
+cp -rf CMake_Fortran_utils build/
+cp -rf Makefile build/
+cp -rf genf90 build/src/flib/
+cd build
+source /usr/local/intel/oneapi/compiler/latest/env/vars.sh
+export PREFIX=/usr/local
+export INTELVER=24
+export IBMPI3=mvapich-4.0
+export HDF5_VER=1.13.2
+export NETCDF6_VER=4.9.2
+export PNETCDF_VER=1.14.0
+export PIO_VER=2.6.2
+export PATH=$PREFIX/mpi/intel$INTELVER/$IBMPI3/bin:$PATH
+HDF5_TEMP=$HDF5
+export HDF5=$PREFIX/hdf5/$HDF5_VER_intel$INTELVER
+CC=mpicc FC=mpif90 cmake .. -DNetCDF_C_PATH=$PREFIX/netcdf/$NETCDF6_VER_intel$INTELVER -DNetCDF_Fortran_PATH=$PREFIX/netcdf/$NETCDF6_VER_intel$INTELVER -DPnetCDF_PATH=$PREFIX/pnetcdf/$PNETCDF_VER_intel$INTELVER_$IBMPI3 -DCMAKE_INSTALL_PREFIX=$PREFIX/pio/$PIO_VER_intel$INTELVER_$IBMPI3
+make -j4 && make install
+unset CC FC
+export HDF5=$HDF5_TEMP
